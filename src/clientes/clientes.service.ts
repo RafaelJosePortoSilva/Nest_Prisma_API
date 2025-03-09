@@ -1,26 +1,53 @@
 import { Injectable } from '@nestjs/common';
-import { CreateClienteDto } from './dto/create-cliente.dto';
-import { UpdateClienteDto } from './dto/update-cliente.dto';
+import { PrismaService } from '../database/prisma.service';
+import { Clientes, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ClientesService {
-  create(createClienteDto: CreateClienteDto) {
-    return 'This action adds a new cliente';
+  constructor(private prisma : PrismaService){}
+
+  async create(data: Prisma.ClientesCreateInput): Promise<Clientes> {
+    return this.prisma.clientes.create({data})
   }
 
-  findAll() {
-    return `This action returns all clientes`;
+  findAll(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.ClientesWhereUniqueInput;
+    where?: Prisma.ClientesWhereInput;
+    orderBy?: Prisma.ClientesOrderByWithRelationInput;
+  }): Promise<Clientes[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.clientes.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} cliente`;
+  async findOne(clientesWhereUniqueInput: Prisma.ClientesWhereUniqueInput,
+  ): Promise<Clientes | null> {
+    return this.prisma.clientes.findUnique({
+      where:clientesWhereUniqueInput,
+    });
   }
 
-  update(id: number, updateClienteDto: UpdateClienteDto) {
-    return `This action updates a #${id} cliente`;
+  async update(params:{
+    where: Prisma.ClientesWhereUniqueInput;
+    data: Prisma.ClientesUpdateInput;
+  }): Promise<Clientes> {
+    const {where, data} = params;
+    return this.prisma.clientes.update({
+      data,
+      where,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cliente`;
+  async remove(where: Prisma.ClientesWhereUniqueInput): Promise<Clientes>{
+    return this.prisma.clientes.delete({
+      where,
+    });
   }
 }
